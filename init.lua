@@ -67,6 +67,8 @@ function runLayout(layout)
     if next(layout,i) == nil then
       local message
       if t.layout then
+        if t.layout ~= 'relax' then
+          hs.wifi.setPower(false)
         message = "Successfully applied " .. t.layout .. " layout"
       else
         message = "Successfully applied layout"
@@ -95,6 +97,7 @@ local screenwatcher = hs.screen.watcher.new(function()
       showMessage("Default sound output", "Set default sound output to SAMSUNG audio")      
     end
     runLayout(layouts.relax)
+    hs.wifi.setPower(true)
   end
 end)
 screenwatcher:start()
@@ -114,16 +117,15 @@ updateZoomStatus = function(event)
 end
 
 mash = {'shift', 'ctrl', 'cmd'}
-hs.hotkey.bind(mash, 'l', function() hs.window.focusedWindow():move(units.right30, nil, true) end)
 hs.hotkey.bind(mash, 'h', function() hs.window.focusedWindow():move(units.left70, nil, true) end)
 hs.hotkey.bind(mash, 'k', function() hs.window.focusedWindow():move(units.top50, nil, true) end)
 hs.hotkey.bind(mash, 'j', function() hs.window.focusedWindow():move(units.bot50, nil, true) end)
-hs.hotkey.bind(mash, ']', function() hs.window.focusedWindow():move(units.topright30, nil, true) end)
+hs.hotkey.bind(mash, 'l', function() hs.window.focusedWindow():move(units.right30, nil, true) end)
 hs.hotkey.bind(mash, '[', function() hs.window.focusedWindow():move(units.topleft30, nil, true) end)
+hs.hotkey.bind(mash, ']', function() hs.window.focusedWindow():move(units.topright30, nil, true) end)
 hs.hotkey.bind(mash, ';', function() hs.window.focusedWindow():move(units.bot80, nil, true) end)
 hs.hotkey.bind(mash, "'", function() hs.window.focusedWindow():move(units.bot90, nil, true) end)
 hs.hotkey.bind(mash, 'm', function() hs.window.focusedWindow():move(units.maximum, nil, true) end)
-
 hs.hotkey.bind(mash, '0', function() runLayout(layouts.covisit) end)
 hs.hotkey.bind(mash, '9', function() runLayout(layouts.meeting) end)
 hs.hotkey.bind(mash, '8', function() runLayout(layouts.coding) end)
