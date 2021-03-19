@@ -69,6 +69,7 @@ function runLayout(layout)
       if t.layout then
         if t.layout ~= 'relax' then
           hs.wifi.setPower(false)
+        end
         message = "Successfully applied " .. t.layout .. " layout"
       else
         message = "Successfully applied layout"
