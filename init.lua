@@ -69,6 +69,18 @@ function runLayout(layout)
       if t.layout then
         if t.layout ~= 'relax' then
           hs.wifi.setPower(false)
+          hs.printf('Turned wifi off')
+        else
+          if hs.screen.find('SAMSUNG') then
+            local samsungaudio = hs.audiodevice.findOutputByName('SAMSUNG')
+            if samsungaudio ~= nil then
+              samsungaudio:setDefaultOutputDevice()
+              showMessage("Default sound output", "Set default sound output to SAMSUNG audio")      
+            end
+            runLayout(layouts.relax)
+            hs.wifi.setPower(true)
+            hs.printf('Turned wifi on')
+          end
         end
         message = "Successfully applied " .. t.layout .. " layout"
       else
@@ -89,19 +101,6 @@ function showMessage(title, message)
     note = nil
   end)
 end
-
-local screenwatcher = hs.screen.watcher.new(function()
-  if hs.screen.find('SAMSUNG') then
-    local samsungaudio = hs.audiodevice.findOutputByName('SAMSUNG')
-    if samsungaudio ~= nil then
-      samsungaudio:setDefaultOutputDevice()
-      showMessage("Default sound output", "Set default sound output to SAMSUNG audio")      
-    end
-    runLayout(layouts.relax)
-    hs.wifi.setPower(true)
-  end
-end)
-screenwatcher:start()
 
 -- requires: brew install vitorgalvao/tiny-scripts/calm-notifications
 local dndStatusBeforeZoom
