@@ -75,9 +75,8 @@ function runLayout(layout)
             local samsungaudio = hs.audiodevice.findOutputByName('SAMSUNG')
             if samsungaudio ~= nil then
               samsungaudio:setDefaultOutputDevice()
-              showMessage("Default sound output", "Set default sound output to SAMSUNG audio")      
+              showMessage("Default sound output", "Set default sound output to SAMSUNG audio")
             end
-            runLayout(layouts.relax)
             hs.wifi.setPower(true)
             hs.printf('Turned wifi on')
           end
@@ -86,34 +85,27 @@ function runLayout(layout)
       else
         message = "Successfully applied layout"
       end
-      showMessage("Apply layout", message) 
+      showMessage("Apply layout", message)
     end
+  end
+end
+
+function shareScreen()
+  local zoom = hs.application.get('zoom.us')
+  if zoom then
+    hs.eventtap.keyStroke({'shift', 'cmd'}, 's', zoom)
   end
 end
 
 function showMessage(title, message)
   local note = hs.notify.new({
-    title=title, 
+    title=title,
     informativeText=message
   }):send()
   hs.timer.doAfter(3, function()
     note:withdraw()
     note = nil
   end)
-end
-
--- requires: brew install vitorgalvao/tiny-scripts/calm-notifications
-local dndStatusBeforeZoom
-updateZoomStatus = function(event)
-  -- restore startup status on quit
-  if (event == "from-running-to-closed") then
-    hs.execute("calm-notifications " .. dndStatusBeforeZoom, true)
-  elseif (event == "from-closed-to-running") then
-    dndStatusBeforeZoom, status, termType = hs.execute("calm-notifications status", true):gsub("\n$", "")
-    if dndStatusBeforeZoom == "off" then
-      hs.execute("calm-notifications on", true)
-    end
-  end
 end
 
 mash = {'shift', 'ctrl', 'cmd'}
@@ -130,6 +122,21 @@ hs.hotkey.bind(mash, '0', function() runLayout(layouts.covisit) end)
 hs.hotkey.bind(mash, '9', function() runLayout(layouts.meeting) end)
 hs.hotkey.bind(mash, '8', function() runLayout(layouts.coding) end)
 hs.hotkey.bind(mash, '7', function() runLayout(layouts.relax) end)
+hs.hotkey.bind({'shift', 'alt'}, 's', function() shareScreen() end)
+
+-- requires: brew install vitorgalvao/tiny-scripts/calm-notifications
+local dndStatusBeforeZoom
+updateZoomStatus = function(event)
+  -- restore startup status on quit
+  if (event == "from-running-to-closed") then
+    hs.execute("calm-notifications " .. dndStatusBeforeZoom, true)
+  elseif (event == "from-closed-to-running") then
+    dndStatusBeforeZoom, status, termType = hs.execute("calm-notifications status", true):gsub("\n$", "")
+    if dndStatusBeforeZoom == "off" then
+      hs.execute("calm-notifications on", true)
+    end
+  end
+end
 
 hs.loadSpoon("Zoom")
 spoon.Zoom:setStatusCallback(updateZoomStatus)
