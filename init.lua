@@ -1,3 +1,5 @@
+-- Hammerspoon init file
+
 hs.window.animationDuration = 0
 
 units = {
