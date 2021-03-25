@@ -96,6 +96,8 @@ function shareScreen()
   local zoom = hs.application.get('zoom.us')
   if zoom then
     hs.eventtap.keyStroke({'shift', 'cmd'}, 's', zoom)
+  else
+    showMessage("Share Screen", "You have to open Zoom first")
   end
 end
 
@@ -132,11 +134,13 @@ updateZoomStatus = function(event)
   -- restore startup status on quit
   if (event == "from-running-to-closed") then
     hs.execute("calm-notifications " .. dndStatusBeforeZoom, true)
+    hs.printf('Restored DND to original state:%s', dndStatusBeforeZoom)
   elseif (event == "from-closed-to-running") then
     dndStatusBeforeZoom, status, termType = hs.execute("calm-notifications status", true):gsub("\n$", "")
     if dndStatusBeforeZoom == "off" then
       hs.execute("calm-notifications on", true)
     end
+    hs.printf('DND original state:%s', dndStatusBeforeZoom)
   end
 end
 
