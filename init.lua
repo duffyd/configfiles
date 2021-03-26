@@ -24,7 +24,7 @@ layouts = {
     {name = 'Safari', app = 'Safari.app', screen = 'VX3276%-QHD', unit = hs.layout.left50},
     {name = 'Eclipse', app = 'Eclipse.app', screen = 'VX3276%-QHD', unit = hs.layout.right50},
     {name = 'Terminal', app = 'Terminal.app', screen = 'Built%-in Retina Display', unit = hs.layout.left50},
-    {name = 'Telegram Lite', app = 'Telegram Lite.app', screen = 'Built%-in Retina Display', unit = hs.layout.right50, layout = 'coding'}
+    {name = 'Telegram', app = 'Telegram.app', screen = 'Built%-in Retina Display', unit = hs.layout.right50, layout = 'coding'}
  },
  covisit = {
     {name = 'Acrobat Reader', app = 'Adobe Acrobat Reader DC.app', screen = 'Built%-in Retina Display', unit = hs.layout.left50},
@@ -92,12 +92,12 @@ function runLayout(layout)
   end
 end
 
-function shareScreen()
-  local zoom = hs.application.get('zoom.us')
-  if zoom then
-    hs.eventtap.keyStroke({'shift', 'cmd'}, 's', zoom)
+function sendKeysToApp(appname, modifiers, char)
+  local app = hs.application.get(appname)
+  if app then
+    hs.eventtap.keyStroke(modifiers, char, app)
   else
-    showMessage("Share Screen", "You have to open Zoom first")
+    showMessage("Send Keys To App", "You have to open " .. appname .. " first")
   end
 end
 
@@ -126,7 +126,8 @@ hs.hotkey.bind(mash, '0', function() runLayout(layouts.covisit) end)
 hs.hotkey.bind(mash, '9', function() runLayout(layouts.meeting) end)
 hs.hotkey.bind(mash, '8', function() runLayout(layouts.coding) end)
 hs.hotkey.bind(mash, '7', function() runLayout(layouts.relax) end)
-hs.hotkey.bind({'shift', 'alt'}, 's', function() shareScreen() end)
+hs.hotkey.bind(mash, 's', function() sendKeysToApp('zoom.us', {'shift', 'cmd'}, 's') end)
+hs.hotkey.bind(mash, 'n', function() sendKeysToApp('VLC', {'cmd'}, hs.keycodes.map['right']) end)
 
 -- requires: brew install vitorgalvao/tiny-scripts/calm-notifications
 local dndStatusBeforeZoom
