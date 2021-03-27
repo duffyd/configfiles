@@ -113,10 +113,10 @@ function showMessage(title, message)
 end
 
 mash = {'shift', 'alt'}
-hs.hotkey.bind(mash, 'h', function() hs.window.focusedWindow():move(units.left70, nil, true) end)
+hs.hotkey.bind(mash, 'h', function() hs.window.focusedWindow():move(hs.layout.left50, nil, true) end)
 hs.hotkey.bind(mash, 'k', function() hs.window.focusedWindow():move(units.top50, nil, true) end)
 hs.hotkey.bind(mash, 'j', function() hs.window.focusedWindow():move(units.bot50, nil, true) end)
-hs.hotkey.bind(mash, 'l', function() hs.window.focusedWindow():move(units.right30, nil, true) end)
+hs.hotkey.bind(mash, 'l', function() hs.window.focusedWindow():move(hs.layout.right50, nil, true) end)
 hs.hotkey.bind(mash, '[', function() hs.window.focusedWindow():move(units.topleft30, nil, true) end)
 hs.hotkey.bind(mash, ']', function() hs.window.focusedWindow():move(units.topright30, nil, true) end)
 hs.hotkey.bind(mash, ';', function() hs.window.focusedWindow():move(units.bot80, nil, true) end)
