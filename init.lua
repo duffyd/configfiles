@@ -112,7 +112,7 @@ function showMessage(title, message)
   end)
 end
 
-mash = {'shift', 'ctrl', 'cmd'}
+mash = {'shift', 'alt'}
 hs.hotkey.bind(mash, 'h', function() hs.window.focusedWindow():move(units.left70, nil, true) end)
 hs.hotkey.bind(mash, 'k', function() hs.window.focusedWindow():move(units.top50, nil, true) end)
 hs.hotkey.bind(mash, 'j', function() hs.window.focusedWindow():move(units.bot50, nil, true) end)
