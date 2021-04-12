@@ -69,18 +69,24 @@ function runLayout(layout)
     if next(layout,i) == nil then
       local message
       if t.layout then
-        if t.layout ~= 'relax' then
-          hs.wifi.setPower(false)
-          hs.printf('Turned wifi off')
+        if t.layout == 'meeting' then
+          -- requires: brew install vitorgalvao/tiny-scripts/calm-notifications
+          hs.execute("calm-notifications on", true)
         else
-          if hs.screen.find('SAMSUNG') then
-            local samsungaudio = hs.audiodevice.findOutputByName('SAMSUNG')
-            if samsungaudio ~= nil then
-              samsungaudio:setDefaultOutputDevice()
-              showMessage("Default sound output", "Set default sound output to SAMSUNG audio")
+          hs.execute("calm-notifications off", true)
+          if t.layout == 'relax' then
+            if hs.screen.find('SAMSUNG') then
+              local samsungaudio = hs.audiodevice.findOutputByName('SAMSUNG')
+              if samsungaudio ~= nil then
+                samsungaudio:setDefaultOutputDevice()
+                showMessage("Default sound output", "Set default sound output to SAMSUNG audio")
+              end
             end
-            hs.wifi.setPower(true)
-            hs.printf('Turned wifi on')
+            --hs.wifi.setPower(true)
+            --hs.printf('Turned wifi on')
+          else
+            --hs.wifi.setPower(false)
+            --hs.printf('Turned wifi off')
           end
         end
         message = "Successfully applied " .. t.layout .. " layout"
@@ -128,23 +134,4 @@ hs.hotkey.bind(mash, '8', function() runLayout(layouts.coding) end)
 hs.hotkey.bind(mash, '7', function() runLayout(layouts.relax) end)
 hs.hotkey.bind(mash, 's', function() sendKeysToApp('zoom.us', {'shift', 'cmd'}, 's') end)
 hs.hotkey.bind(mash, 'n', function() sendKeysToApp('VLC', {'cmd'}, hs.keycodes.map['right']) end)
-
--- requires: brew install vitorgalvao/tiny-scripts/calm-notifications
-local dndStatusBeforeZoom
-updateZoomStatus = function(event)
-  -- restore startup status on quit
-  if (event == "from-running-to-closed") then
-    hs.execute("calm-notifications " .. dndStatusBeforeZoom, true)
-    hs.printf('Restored DND to original state:%s', dndStatusBeforeZoom)
-  elseif (event == "from-closed-to-running") then
-    dndStatusBeforeZoom, status, termType = hs.execute("calm-notifications status", true):gsub("\n$", "")
-    if dndStatusBeforeZoom == "off" then
-      hs.execute("calm-notifications on", true)
-    end
-    hs.printf('DND original state:%s', dndStatusBeforeZoom)
-  end
-end
-
-hs.loadSpoon("Zoom")
-spoon.Zoom:setStatusCallback(updateZoomStatus)
-spoon.Zoom:start()
+hs.hotkey.bind(mash, 'w', function() hs.wifi.setPower(not hs.wifi.interfaceDetails()['power']) end)
