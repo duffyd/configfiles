@@ -25,8 +25,8 @@ layouts = {
     {name = 'Eclipse', app = 'Eclipse.app', screen = 'VX3276%-QHD', unit = hs.layout.right50},
     {name = 'Terminal', app = 'Terminal.app', screen = 'Built%-in Retina Display', unit = hs.layout.left50},
     {name = 'Telegram', app = 'Telegram.app', screen = 'Built%-in Retina Display', unit = hs.layout.right50, layout = 'coding'}
- },
- covisit = {
+  },
+  covisit = {
     {name = 'Acrobat Reader', app = 'Adobe Acrobat Reader DC.app', screen = 'Built%-in Retina Display', unit = hs.layout.left50},
     {name = 'Finder', app = 'Finder.app', screen = 'Built%-in Retina Display', unit = hs.layout.right50},
     {name = 'Terminal', app = 'Terminal.app', screen = 'VX3276%-QHD', unit = units.topright30},
@@ -35,17 +35,23 @@ layouts = {
     --{name = 'Messages', app = 'Messages.app', screen = 'Built%-in Retina Display', unit = units.top0to33},
     --{name = 'WhatsApp', app = 'WhatsApp.app', screen = 'Built%-in Retina Display', unit = units.top66to100},
     --{name = 'LINE', app = 'LINE.app', screen = 'Built%-in Retina Display', unit = units.top33to66}
- },
- relax = {
-    {name = 'Safari', app = 'Safari.app', screen = 'SAMSUNG', unit = hs.layout.maximized, layout = 'relax'},
- },
- meeting = {
+  },
+  relax = {
+    {name = 'Safari', app = 'Safari.app', screen = 'SAMSUNG', unit = hs.layout.maximized, layout = 'relax'}
+  },
+  meeting = {
     {name = 'OBS', app = 'OBS.app', screen = 'VX3276%-QHD', unit = units.center},
-    {name = 'zoom.us', app = 'zoom.us.app', screen = 'VX3276%-QHD', unit = units.bot80, layout = 'meeting'},
+    {name = 'NDI Virtual Input', app = 'NDI Virtual Input.app', screen = 'VX3276%-QHD', unit = units.center},
+    {name = 'zoom.us', app = 'zoom.us.app', screen = 'VX3276%-QHD', unit = units.center, layout = 'meeting'}
+  },
+  talk = {
+    {name = 'VLC', app = 'VLC.app', screen = 'Built%-in Retina Display', unit = units.center},
+    {name = 'zoom.us', app = 'zoom.us.app', screen = 'Built%-in Retina Display', unit = units.center, layout = 'talk'}
  }
 }
 
 function runLayout(layout)
+  local zoomlayouts = Set{'meeting', 'talk'}
   for i = 1,#layout do
     local t = layout[i]
     local theapp = hs.application.get(t.name)
@@ -69,7 +75,7 @@ function runLayout(layout)
     if next(layout,i) == nil then
       local message
       if t.layout then
-        if t.layout == 'meeting' then
+        if zoomlayouts[t.layout] then
           -- requires: brew install vitorgalvao/tiny-scripts/calm-notifications
           hs.execute("calm-notifications on", true)
         else
@@ -96,6 +102,12 @@ function runLayout(layout)
       showMessage("Apply layout", message)
     end
   end
+end
+
+function Set(list)
+  local set = {}
+  for _, l in ipairs(list) do set[l] = true end
+  return set
 end
 
 function sendKeysToApp(appname, modifiers, char)
@@ -128,10 +140,11 @@ hs.hotkey.bind(mash, ']', function() hs.window.focusedWindow():move(units.toprig
 hs.hotkey.bind(mash, ';', function() hs.window.focusedWindow():move(units.bot80, nil, true) end)
 hs.hotkey.bind(mash, "'", function() hs.window.focusedWindow():move(units.bot90, nil, true) end)
 hs.hotkey.bind(mash, 'm', function() hs.window.focusedWindow():move(units.maximum, nil, true) end)
-hs.hotkey.bind(mash, '0', function() runLayout(layouts.covisit) end)
+hs.hotkey.bind(mash, '0', function() runLayout(layouts.talk) end)
 hs.hotkey.bind(mash, '9', function() runLayout(layouts.meeting) end)
-hs.hotkey.bind(mash, '8', function() runLayout(layouts.coding) end)
-hs.hotkey.bind(mash, '7', function() runLayout(layouts.relax) end)
+hs.hotkey.bind(mash, '8', function() runLayout(layouts.covisit) end)
+hs.hotkey.bind(mash, '7', function() runLayout(layouts.coding) end)
+hs.hotkey.bind(mash, '6', function() runLayout(layouts.relax) end)
 hs.hotkey.bind(mash, 's', function() sendKeysToApp('zoom.us', {'shift', 'cmd'}, 's') end)
 hs.hotkey.bind(mash, 'n', function() sendKeysToApp('VLC', {'cmd'}, hs.keycodes.map['right']) end)
 hs.hotkey.bind(mash, 'w', function() hs.wifi.setPower(not hs.wifi.interfaceDetails()['power']) end)
