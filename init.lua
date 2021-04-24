@@ -52,26 +52,28 @@ layouts = {
 
 function runLayout(layout)
   local zoomlayouts = Set{'meeting', 'talk'}
+  local slowapps = Set{'Eclipse', 'zoom.us'}
+  local last = #layout - 0
+  local mainScreen = hs.screen.primaryScreen()
+  hs.dialog.alert(mainScreen:currentMode().w/2, mainScreen:currentMode().h/2-91, function(result) print("Clicked " .. result) end, "Loading " .. layout[last].layout .. " layout ...")
   for i = 1,#layout do
     local t = layout[i]
     local theapp = hs.application.get(t.name)
     local appwait
     if theapp == nil then
-      if t.name == 'Eclipse' then
+      if slowapps[t.name] then
         appwait = 10
       else
         appwait = 5
       end
       theapp = hs.application.open(t.app, appwait)
     end
-    if theapp ~= nil then
-      local win = theapp:mainWindow()
-      local screen
-      if t.screen ~= nil then
-        screen = hs.screen.find(t.screen)
-      end
-      win:move(t.unit, screen, true)
+    local win = theapp:mainWindow()
+    local screen
+    if t.screen ~= nil then
+      screen = hs.screen.find(t.screen)
     end
+    win:move(t.unit, screen, true)
     if next(layout,i) == nil then
       local message
       if t.layout then
@@ -131,15 +133,10 @@ function showMessage(title, message)
 end
 
 mash = {'shift', 'alt'}
-hs.hotkey.bind(mash, 'h', function() hs.window.focusedWindow():move(hs.layout.left50, nil, true) end)
-hs.hotkey.bind(mash, 'k', function() hs.window.focusedWindow():move(units.top50, nil, true) end)
-hs.hotkey.bind(mash, 'j', function() hs.window.focusedWindow():move(units.bot50, nil, true) end)
-hs.hotkey.bind(mash, 'l', function() hs.window.focusedWindow():move(hs.layout.right50, nil, true) end)
-hs.hotkey.bind(mash, '[', function() hs.window.focusedWindow():move(units.topleft30, nil, true) end)
-hs.hotkey.bind(mash, ']', function() hs.window.focusedWindow():move(units.topright30, nil, true) end)
-hs.hotkey.bind(mash, ';', function() hs.window.focusedWindow():move(units.bot80, nil, true) end)
-hs.hotkey.bind(mash, "'", function() hs.window.focusedWindow():move(units.bot90, nil, true) end)
+hs.hotkey.bind(mash, '[', function() hs.window.focusedWindow():move(hs.layout.left50, nil, true) end)
+hs.hotkey.bind(mash, ']', function() hs.window.focusedWindow():move(hs.layout.right50, nil, true) end)
 hs.hotkey.bind(mash, 'm', function() hs.window.focusedWindow():move(units.maximum, nil, true) end)
+hs.hotkey.bind(mash, ';', function() hs.window.focusedWindow():move(units.center, nil, true) end)
 hs.hotkey.bind(mash, '0', function() runLayout(layouts.talk) end)
 hs.hotkey.bind(mash, '9', function() runLayout(layouts.meeting) end)
 hs.hotkey.bind(mash, '8', function() runLayout(layouts.covisit) end)
