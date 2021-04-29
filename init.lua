@@ -58,22 +58,26 @@ function runLayout(layout)
   hs.dialog.alert(mainScreen:currentMode().w/2, mainScreen:currentMode().h/2-91, function(result) print("Clicked " .. result) end, "Loading " .. layout[last].layout .. " layout ...")
   for i = 1,#layout do
     local t = layout[i]
-    local theapp = hs.application.get(t.name)
+    local theapp
     local appwait
+    if slowapps[t.name] then
+      appwait = 10
+    else
+      appwait = 5
+    end
+    print("Trying to open " .. t.app)
+    theapp = hs.application.open(t.name, appwait)
     if theapp == nil then
-      if slowapps[t.name] then
-        appwait = 10
-      else
-        appwait = 5
-      end
       theapp = hs.application.open(t.app, appwait)
     end
     local win = theapp:mainWindow()
-    local screen
-    if t.screen ~= nil then
-      screen = hs.screen.find(t.screen)
+    if win ~= nil then
+      local screen
+      if t.screen ~= nil then
+        screen = hs.screen.find(t.screen)
+      end
+      win:move(t.unit, screen, true)
     end
-    win:move(t.unit, screen, true)
     if next(layout,i) == nil then
       local message
       if t.layout then
