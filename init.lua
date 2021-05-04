@@ -60,17 +60,20 @@ function runLayout(layout)
     local t = layout[i]
     local theapp
     local appwait
+    local win
     if slowapps[t.name] then
       appwait = 10
     else
       appwait = 5
     end
     print("Trying to open " .. t.app)
-    theapp = hs.application.open(t.name, appwait)
+    theapp = hs.application.open(t.name)
     if theapp == nil then
       theapp = hs.application.open(t.app, appwait)
     end
-    local win = theapp:mainWindow()
+    if theapp ~= nil then
+      win = theapp:mainWindow()
+    end
     if win ~= nil then
       local screen
       if t.screen ~= nil then
@@ -94,11 +97,11 @@ function runLayout(layout)
                 showMessage("Default sound output", "Set default sound output to SAMSUNG audio")
               end
             end
-            --hs.wifi.setPower(true)
-            --hs.printf('Turned wifi on')
+            hs.wifi.setPower(true)
+            hs.printf('Turned wifi on')
           else
-            --hs.wifi.setPower(false)
-            --hs.printf('Turned wifi off')
+            hs.wifi.setPower(false)
+            hs.printf('Turned wifi off')
           end
         end
         message = "Successfully applied " .. t.layout .. " layout"
