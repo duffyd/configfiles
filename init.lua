@@ -87,9 +87,9 @@ function runLayout(layout)
         if t.layout then
           if zoomlayouts[t.layout] then
             -- requires: brew install vitorgalvao/tiny-scripts/calm-notifications
-            --hs.execute("calm-notifications on", true)
+            hs.execute("calm-notifications on", true)
           else
-            --hs.execute("calm-notifications off", true)
+            hs.execute("calm-notifications off", true)
             if t.layout == 'relax' then
               if hs.screen.find('SAMSUNG') then
                 local samsungaudio = hs.audiodevice.findOutputByName('SAMSUNG')
@@ -100,7 +100,7 @@ function runLayout(layout)
               end
               --hs.wifi.setPower(true)
               --hs.printf('Turned wifi on')
-            else
+            --else
               --hs.wifi.setPower(false)
               --hs.printf('Turned wifi off')
             end
