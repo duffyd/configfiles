@@ -55,62 +55,64 @@ function runLayout(layout)
   local slowapps = Set{'Eclipse', 'zoom.us'}
   local last = #layout - 0
   local mainScreen = hs.screen.primaryScreen()
-  hs.dialog.alert(mainScreen:currentMode().w/2, mainScreen:currentMode().h/2-91, function(result) print("Clicked " .. result) end, "Loading " .. layout[last].layout .. " layout ...")
-  for i = 1,#layout do
-    local t = layout[i]
-    local theapp
-    local appwait
-    local win
-    if slowapps[t.name] then
-      appwait = 10
-    else
-      appwait = 5
-    end
-    print("Trying to open " .. t.app)
-    theapp = hs.application.open(t.name)
-    if theapp == nil then
-      theapp = hs.application.open(t.app, appwait)
-    end
-    if theapp ~= nil then
-      win = theapp:mainWindow()
-    end
-    if win ~= nil then
-      local screen
-      if t.screen ~= nil then
-        screen = hs.screen.find(t.screen)
-      end
-      win:move(t.unit, screen, true)
-    end
-    if next(layout,i) == nil then
-      local message
-      if t.layout then
-        if zoomlayouts[t.layout] then
-          -- requires: brew install vitorgalvao/tiny-scripts/calm-notifications
-          hs.execute("calm-notifications on", true)
-        else
-          hs.execute("calm-notifications off", true)
-          if t.layout == 'relax' then
-            if hs.screen.find('SAMSUNG') then
-              local samsungaudio = hs.audiodevice.findOutputByName('SAMSUNG')
-              if samsungaudio ~= nil then
-                samsungaudio:setDefaultOutputDevice()
-                showMessage("Default sound output", "Set default sound output to SAMSUNG audio")
-              end
-            end
-            hs.wifi.setPower(true)
-            hs.printf('Turned wifi on')
-          else
-            hs.wifi.setPower(false)
-            hs.printf('Turned wifi off')
-          end
-        end
-        message = "Successfully applied " .. t.layout .. " layout"
+  hs.alert("Loading " .. layout[last].layout .. " layout ...", mainScreen)
+  hs.timer.doAfter(.1, function()
+    for i = 1,#layout do
+      local t = layout[i]
+      local theapp
+      local appwait
+      local win
+      if slowapps[t.name] then
+        appwait = 10
       else
-        message = "Successfully applied layout"
+        appwait = 5
       end
-      showMessage("Apply layout", message)
+      print("Trying to open " .. t.app)
+      theapp = hs.application.open(t.name)
+      if theapp == nil then
+        theapp = hs.application.open(t.app, appwait)
+      end
+      if theapp ~= nil then
+        win = theapp:mainWindow()
+      end
+      if win ~= nil then
+        local screen
+        if t.screen ~= nil then
+          screen = hs.screen.find(t.screen)
+        end
+        win:move(t.unit, screen, true)
+      end
+      if next(layout,i) == nil then
+        local message
+        if t.layout then
+          if zoomlayouts[t.layout] then
+            -- requires: brew install vitorgalvao/tiny-scripts/calm-notifications
+            --hs.execute("calm-notifications on", true)
+          else
+            --hs.execute("calm-notifications off", true)
+            if t.layout == 'relax' then
+              if hs.screen.find('SAMSUNG') then
+                local samsungaudio = hs.audiodevice.findOutputByName('SAMSUNG')
+                if samsungaudio ~= nil then
+                  samsungaudio:setDefaultOutputDevice()
+                  showMessage("Default sound output", "Set default sound output to SAMSUNG audio")
+                end
+              end
+              --hs.wifi.setPower(true)
+              --hs.printf('Turned wifi on')
+            else
+              --hs.wifi.setPower(false)
+              --hs.printf('Turned wifi off')
+            end
+          end
+          message = "Successfully applied " .. t.layout .. " layout"
+        else
+          message = "Successfully applied layout"
+        end
+        showMessage("Apply layout", message)
+      end
     end
-  end
+  end)
 end
 
 function Set(list)
