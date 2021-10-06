@@ -1,4 +1,7 @@
 -- Hammerspoon init file
+-- requires the following to be installed:
+-- brew install --cask joshjon-nocturnal
+-- brew install vitorgalvao/tiny-scripts/calm-notifications
 
 hs.window.animationDuration = 0
 
@@ -15,14 +18,15 @@ units = {
   top0to33      = {x = 0.00, y = 0.00, w = 0.33, h = 1.00},
   top33to66     = {x = 0.33, y = 0.00, w = 0.33, h = 1.00},
   top66to100    = {x = 0.66, y = 0.00, w = 0.34, h = 1.00},
+  topcenter     = { x = 0.20, y = 0.00, w = 0.60, h = 0.70 },
   maximum       = { x = 0.00, y = 0.00, w = 1.00, h = 1.00 },
-  center        = { x = 0.20, y = 0.10, w = 0.60, h = 0.80 }
+  center        = { x = 0.20, y = 0.00, w = 0.60, h = 0.80 }
 }
 
 layouts = {
   coding = {
     {name = 'Safari', app = 'Safari.app', screen = 'VX3276%-QHD', unit = hs.layout.left50},
-    {name = 'Eclipse', app = 'Eclipse.app', screen = 'VX3276%-QHD', unit = hs.layout.right50},
+    {name = 'Code', app = 'Code.app', screen = 'VX3276%-QHD', unit = hs.layout.right50},
     {name = 'Terminal', app = 'Terminal.app', screen = 'Built%-in Retina Display', unit = hs.layout.left50},
     {name = 'Telegram', app = 'Telegram.app', screen = 'Built%-in Retina Display', unit = hs.layout.right50, layout = 'coding'}
   },
@@ -40,19 +44,29 @@ layouts = {
     {name = 'Safari', app = 'Safari.app', screen = 'SAMSUNG', unit = hs.layout.maximized, layout = 'relax'}
   },
   meeting = {
-    {name = 'OBS', app = 'OBS.app', screen = 'VX3276%-QHD', unit = units.center},
-    {name = 'NDI Virtual Input', app = 'NDI Virtual Input.app', screen = 'VX3276%-QHD', unit = units.center},
-    {name = 'zoom.us', app = 'zoom.us.app', screen = 'VX3276%-QHD', unit = units.center, layout = 'meeting'}
+    {name = 'zoom.us', app = 'zoom.us.app', screen = 'VX3276%-QHD', unit = units.center},
+    {name = 'Nocturnal', app = 'Nocturnal', screen = 'VX3276%-QHD', unit = units.topcenter, layout = 'meeting'}
+  },
+  witnessing = {
+    {name = 'zoom.us', app = 'zoom.us.app', screen = 'VX3276%-QHD', unit = units.center},
+    {name = 'OBS', app = 'OBS.app', screen = 'VX3276%-QHD', unit = units.topcenter},
+    {name = 'Nocturnal', app = 'Nocturnal', screen = 'VX3276%-QHD', unit = units.topcenter, layout = 'witnessing'}
   },
   talk = {
     {name = 'VLC', app = 'VLC.app', screen = 'Built%-in Retina Display', unit = units.center},
     {name = 'zoom.us', app = 'zoom.us.app', screen = 'Built%-in Retina Display', unit = units.center, layout = 'talk'}
- }
+ },
+ pss = {
+  {name = 'OBS', app = 'OBS.app', screen = 'VX3276%-QHD', unit = units.topcenter},
+  {name = 'WhatsApp', app = 'WhatsApp.app', screen = 'Built%-in Retina Display', unit = hs.layout.left50},
+  {name = 'VLC', app = 'VLC.app', screen = 'Built%-in Retina Display', unit = units.maximum},
+  {name = 'zoom.us', app = 'zoom.us.app', screen = 'VX3276%-QHD', unit = units.maximum, layout = 'pss'}
+}
 }
 
 function runLayout(layout)
-  local zoomlayouts = Set{'meeting', 'talk'}
-  local slowapps = Set{'Eclipse', 'zoom.us'}
+  local zoomlayouts = Set{'meeting', 'talk', 'pss'}
+  local slowapps = Set{'Code', 'zoom.us'}
   local last = #layout - 0
   local mainScreen = hs.screen.primaryScreen()
   hs.alert("Loading " .. layout[last].layout .. " layout ...", mainScreen)
@@ -86,8 +100,8 @@ function runLayout(layout)
         local message
         if t.layout then
           if zoomlayouts[t.layout] then
-            -- requires: brew install vitorgalvao/tiny-scripts/calm-notifications
             hs.execute("calm-notifications on", true)
+            sendKeysToApp({'cmd'}, '1')
           else
             hs.execute("calm-notifications off", true)
             if t.layout == 'relax' then
@@ -98,11 +112,6 @@ function runLayout(layout)
                   showMessage("Default sound output", "Set default sound output to SAMSUNG audio")
                 end
               end
-              --hs.wifi.setPower(true)
-              --hs.printf('Turned wifi on')
-            --else
-              --hs.wifi.setPower(false)
-              --hs.printf('Turned wifi off')
             end
           end
           message = "Successfully applied " .. t.layout .. " layout"
@@ -121,12 +130,17 @@ function Set(list)
   return set
 end
 
-function sendKeysToApp(appname, modifiers, char)
-  local app = hs.application.get(appname)
-  if app then
-    hs.eventtap.keyStroke(modifiers, char, app)
+function sendKeysToApp(modifiers, char, appname)
+  appname = appname or nil
+  if appname then
+    local app = hs.application.get(appname)
+    if app then
+      hs.eventtap.keyStroke(modifiers, char, app)
+    else
+      showMessage("Send Keys To App", "You have to open " .. appname .. " first")
+    end
   else
-    showMessage("Send Keys To App", "You have to open " .. appname .. " first")
+    hs.eventtap.keyStroke(modifiers, char)
   end
 end
 
@@ -148,9 +162,13 @@ hs.hotkey.bind(mash, 'm', function() hs.window.focusedWindow():move(units.maximu
 hs.hotkey.bind(mash, ';', function() hs.window.focusedWindow():move(units.center, nil, true) end)
 hs.hotkey.bind(mash, '0', function() runLayout(layouts.talk) end)
 hs.hotkey.bind(mash, '9', function() runLayout(layouts.meeting) end)
-hs.hotkey.bind(mash, '8', function() runLayout(layouts.covisit) end)
+hs.hotkey.bind(mash, '8', function() runLayout(layouts.witnessing) end)
 hs.hotkey.bind(mash, '7', function() runLayout(layouts.coding) end)
 hs.hotkey.bind(mash, '6', function() runLayout(layouts.relax) end)
-hs.hotkey.bind(mash, 's', function() sendKeysToApp('zoom.us', {'shift', 'cmd'}, 's') end)
-hs.hotkey.bind(mash, 'n', function() sendKeysToApp('VLC', {'cmd'}, hs.keycodes.map['right']) end)
+hs.hotkey.bind(mash, '5', function() runLayout(layouts.covisit) end)
+hs.hotkey.bind(mash, '4', function() runLayout(layouts.pss) end)
+hs.hotkey.bind(mash, 'a', function() sendKeysToApp({'shift', 'cmd'}, 'a', 'zoom.us') end)
+hs.hotkey.bind(mash, 'v', function() sendKeysToApp({'shift', 'cmd'}, 'v', 'zoom.us') end)
+hs.hotkey.bind(mash, 's', function() sendKeysToApp({'shift', 'cmd'}, 's', 'zoom.us') end)
+hs.hotkey.bind(mash, 'n', function() sendKeysToApp({'cmd'}, hs.keycodes.map['right'], 'VLC') end)
 hs.hotkey.bind(mash, 'w', function() hs.wifi.setPower(not hs.wifi.interfaceDetails()['power']) end)
